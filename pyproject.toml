@@ -1,0 +1,19 @@
+[project]
+name = "content-generator"
+version = "0.1.0"
+description = "Content automation using Claude API"
+requires-python = ">=3.10"
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "python-dotenv",
+    "anthropic>=0.30.0",
+    "requests>=2.33.1",
+    "beautifulsoup4>=4.14.3",
+    "streamlit>=1.56.0",
+]
+
+[tool.uv]
+# Optional but recommended
+dev-dependencies = []
