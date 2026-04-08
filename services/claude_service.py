@@ -3,6 +3,8 @@ import json
 from anthropic import Anthropic
 from dotenv import load_dotenv
 from services.utils import extract_webpage_content
+import re
+import json
 
 load_dotenv()
 
