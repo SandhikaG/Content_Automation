@@ -83,7 +83,7 @@ if st.button("📊 Generate Brief"):
             res = requests.post(
                 f"{BACKEND_URL}/generate-brief",
                 json=get_payload(),
-                timeout=60
+                timeout=180
             )
 
             data = res.json()
@@ -103,6 +103,8 @@ if st.button("📊 Generate Brief"):
 
             else:
                 st.error(data.get("error", "Unknown error"))
+        except requests.exceptions.Timeout:
+            st.error("⏳ Server is taking too long. Try again in a few seconds.")
 
         except Exception as e:
             st.error(f"❌ Request failed: {e}")
@@ -136,7 +138,7 @@ if st.session_state.session_id:
             try:
                 res = requests.get(
                     f"{BACKEND_URL}/generate-article/{st.session_state.session_id}",
-                    timeout=120
+                    timeout=180
                 )
 
                 data = res.json()
@@ -147,6 +149,8 @@ if st.session_state.session_id:
 
                 else:
                     st.error(data.get("error", "Unknown error"))
+            except requests.exceptions.Timeout:
+                st.error("⏳ Article generation is slow. Please retry.")
 
             except Exception as e:
                 st.error(f"❌ Request failed: {e}")
