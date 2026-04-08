@@ -41,7 +41,10 @@ Generate a COMPLETE CONTENT BRIEF in STRICT JSON format.
 ⚠️ RULES:
 - Follow ALL specifications strictly
 - Do NOT skip any field
-- Return ONLY JSON (no explanation)
+- Return ONLY valid JSON
+- Do NOT include ```json or ``` or any text before/after
+- Do NOT include explanations
+- Output must be directly parseable by json.loads()
 
 INPUT:
 {input_context}
@@ -117,17 +120,33 @@ OUTPUT FORMAT:
 
         # 🧹 Clean output (remove markdown if Claude adds it)
         if raw_output.startswith("```"):
-            raw_output = raw_output.split("```")[1]
+            raw_output = raw_output.replace("```json", "").replace("```", "").strip()
+        # 🔥 Extract ONLY JSON part (VERY IMPORTANT)
+        def extract_json(text):
+            match = re.search(r'\{.*\}', text, re.DOTALL)
+            if match:
+                return match.group()
+            return None
 
-        # 🔄 Convert to JSON
+        json_text = extract_json(raw_output)
+
+        if not json_text:
+            return {
+                "success": False,
+                "error": "No JSON found in Claude response",
+                "raw_output": raw_output
+            }
+
+        # 🔄 Safe parsing
         try:
-            parsed_output = json.loads(raw_output)
-        except Exception:
+            parsed_output = json.loads(json_text)
+        except json.JSONDecodeError:
             return {
                 "success": False,
                 "error": "Claude returned invalid JSON",
                 "raw_output": raw_output
             }
+        
 
         # 🔥 Store session
         SESSION_STORE[session_id] = {
